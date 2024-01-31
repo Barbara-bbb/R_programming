@@ -1,1 +1,214 @@
+# Write a function that returns a hospital name for a given state, for the given ranking, i.e. 5 means the 5th lowest 30-day death rate, 
+#and for a given condition (heart attack, heart failure, penumonia).Skip NA cases. In case of a tie, return a hospital name that in 
+# the first in alphabetical order. 
 
+rm(list=ls())  # clear workspace
+
+
+#Test cases
+
+# rankhospital("MD","heart failure", 5)
+# 5 is the lowest 5th lowest 30-day death rate (smaller numbers are better)
+# rankhospital("TX","heart failure", 4)      # works well
+# rankhospital("MN","heart failure", 5000)  # out of bonds is ok, to be done with a message
+# rankhospital("MD","heart attack", "worst")  # works well
+# rankhospital("MD","heart attack", "best")   # works well 
+# rankhospital("MD","heart attack", 2)   # works well 
+
+
+# rankhospital("MD","heart failure", "worst")  # works well, two hospitals here (ranking solves a tie)
+# rankhospital("MD","heart failure", "best")    # works well
+# rankhospital("MD","heart failure", 2)    # works well
+
+# rankhospital("MD","pneumonia", "worst")  # works well
+# rankhospital("MD","pneumonia", "best")   # works well
+# rankhospital("MD","pneumonia", 2)   # works well
+
+
+outcome <- read.csv(“.…csv”,colClasses = "character")   # read the data file
+head<-head(outcome)
+
+
+# Support
+# num <-list (5, "best", "worst")
+
+
+rankhospital <- function(state, outcome, num )  { 
+      
+      outcome <- c(outcome)
+      print(outcome)
+      stateF <- c(state)
+      print(stateF)
+      
+      numR <- c(num) 
+      
+      #setting working directory
+      working_directory <- setwd(“~/D…/rprog-data”)
+      
+      outcome_data <- read.csv(“….csv”,colClasses = "character")   # read the data file
+      
+      #  outcome_data is the data
+      
+      hospital_name <- outcome_data [ , 2 ]  # list of all hospital names (Hospital.name variable)
+      state <- outcome_data [ , 7 ]  # list of all abbreviated state names (State variable)
+      outcome_data [ ,11] <- as.numeric(outcome_data [  ,11])  # heart attack
+      mortality_rate_heart_attack <-  outcome_data [ ,11]
+      
+      outcome_data [ ,17] <- as.numeric(outcome_data [  ,17])  # heart failure
+      mortality_rate_heart_failure <-  outcome_data [ ,17]
+      
+      outcome_data [ ,23] <- as.numeric(outcome_data [  ,23])  # pneumonia
+      mortality_rate_pneumonia <-  outcome_data [ ,23]
+      
+      my_data1 <- data.frame (hospital_name, state,  mortality_rate_heart_attack)
+      my_data2 <- data.frame (hospital_name, state,  mortality_rate_heart_failure)
+      my_data3 <- data.frame (hospital_name, state,  mortality_rate_pneumonia)
+      
+      good1 <- complete.cases (my_data1)
+      my_data1<- my_data1 [good1, ]
+      good2 <- complete.cases (my_data2)
+      my_data2<- my_data2 [good2,  ]
+      good3 <- complete.cases (my_data3)
+      my_data3<- my_data3 [good3,  ]
+      
+      
+      # sorting / ordering by rate
+      my_data1 <- my_data1[order(my_data1$mortality_rate_heart_attack), ]   # all states together
+      my_data2 <- my_data2[order(my_data2$mortality_rate_heart_failure), ]
+      my_data3 <- my_data3[order(my_data3$mortality_rate_pneumonia), ]
+      
+      
+      if (outcome == "heart attack" ) {
+            
+            print(stateF)
+            
+            ########## support one ##########
+            ######### state <- c("AK")  # not needed any more
+            
+            a <- my_data1$hospital_name  # vector with hospital names 
+            a<- data.frame (a) 
+            print(nrow(a))
+            
+            b <- my_data1$state == stateF   #logical vector TRUE / FALSE, only TRUE is for the selected state i.e. "AK"
+            b<- data.frame (b) 
+            print(nrow(b))
+            
+            # this part is for ranking
+            c2 <- my_data1$mortality_rate_heart_attack  # logical vector TRUE / FALSE, giving TRUE for the selected state, as TRUE # NO VALUE ASSIGNED FOR RANKING
+            c2<- data.frame (c2) 
+            print(nrow(c2))
+            
+            d2 <- data.frame(a,b,c2)
+            size_d2 <- nrow(d2)   #### if num  > size_d, return NA  
+            
+            d2 <- d2[order(d2 [ ,3], d2 [ , 1]), ]   #sort/ order  mortality rate and by name (for a given state)
+            
+            #empty matrixes: RANKING PART
+            hospitalName<-matrix(nrow=nrow(d2), ncol=1)
+            mortalityRate<-matrix(nrow=nrow(d2), ncol=1)
+            for (i in 1:size_d2) {
+                  if ( d2 [i, 2] == TRUE ) {  # Extraction for a given state is here
+                        
+                        hospitalName [i] <-  d2 [i, 1]
+                        mortalityRate [i] <-  d2[i, 3]
+                        # print(hospitalName)
+                  }
+            }
+                  
+      } else if (outcome == "heart failure" ) {
+            
+            print(stateF)
+            
+           ########## support one ##########
+            ######### state <- c("AK")  # not needed any more
+            
+            a <- my_data2$hospital_name  # vector with hospital names 
+            a<- data.frame (a) 
+            print(nrow(a))
+            
+            b <- my_data2$state == stateF   #logical vector TRUE / FALSE, only TRUE is for the selected state i.e. "AK"
+            b<- data.frame (b) 
+            print(nrow(b))
+            
+            # this part is for ranking
+            c2 <- my_data2$mortality_rate_heart_failure  # logical vector TRUE / FALSE, giving TRUE for the selected state, as TRUE # NO VALUE ASSIGNED FOR RANKING
+            c2<- data.frame (c2) 
+            print(nrow(c2))
+            
+            d2 <- data.frame(a,b,c2)
+            size_d2 <- nrow(d2)   #### if num  > size_d, return NA  
+            
+            d2 <- d2[order(d2 [ ,3], d2 [ , 1]), ]   #sort/ order  mortality rate and by name
+            
+            #empty matrixes: RANKING PART
+            hospitalName<-matrix(nrow=nrow(d2), ncol=1)
+            mortalityRate<-matrix(nrow=nrow(d2), ncol=1)
+            for (i in 1:size_d2) {
+                  if ( d2 [i, 2] == TRUE ) {  # Extraction for a given state is here
+                        
+                        hospitalName [i] <-  d2 [i, 1]
+                        mortalityRate [i] <-  d2[i, 3]
+                        # print(hospitalName)
+                  }
+            }     
+               
+      } else if (outcome == "pneumonia")  {
+            print(stateF)
+            
+            ########## support one ##########
+            ######### state <- c("AK")  # not needed any more
+            
+            a <- my_data3$hospital_name  # vector with hospital names 
+            a<- data.frame (a) 
+            print(nrow(a))
+            
+            b <- my_data3$state == stateF   #logical vector TRUE / FALSE, only TRUE is for the selected state i.e. "AK"
+            b<- data.frame (b) 
+            print(nrow(b))
+            
+            # this part is for ranking
+            c2 <- my_data3$mortality_rate_pneumonia  # logical vector TRUE / FALSE, giving TRUE for the selected state, as TRUE # NO VALUE ASSIGNED FOR RANKING
+            c2<- data.frame (c2) 
+            print(nrow(c2))
+            
+            d2 <- data.frame(a,b,c2)
+            size_d2 <- nrow(d2)   #### if num  > size_d, return NA  
+            
+            d2 <- d2[order(d2 [ ,3], d2 [ , 1]), ]   #sort/ order  mortality rate and by name
+            
+            #empty matrixes: RANKING PART
+            hospitalName<-matrix(nrow=nrow(d2), ncol=1)
+            mortalityRate<-matrix(nrow=nrow(d2), ncol=1)
+            for (i in 1:size_d2) {
+                  if ( d2 [i, 2] == TRUE ) {  # Extraction for a given state is here
+                        
+                        hospitalName [i] <-  d2 [i, 1]
+                        mortalityRate [i] <-  d2[i, 3]
+                        # print(hospitalName)
+                  }
+            }   
+      }
+     
+      ranking_result <- data.frame(hospitalName, mortalityRate)
+      good5 <- complete.cases (ranking_result)  # NA removal
+      ranking_result<- ranking_result [good5,  ]
+      print (ranking_result)
+      
+      ranking_result <- as.matrix (ranking_result)
+      
+      if  (num == "best")  {
+            print("best")
+            print (ranking_result[1,1])  # first hospital name on the list
+      } else if  (num == "worst")  {
+            print("worst")
+            print (ranking_result[nrow(ranking_result),1])  # last hospital name on the list
+      } else if  (num == as.integer(numR))  {
+            print ("work to be done") 
+            support_rank <- c(1:nrow(ranking_result))
+            ranking_result_int <- data.frame(ranking_result, support_rank)
+            ranking_result_int <- as.matrix (ranking_result_int)
+            # print(ranking_result_int)
+            print( ranking_result_int [ num, 1])
+      }   
+      
+}
