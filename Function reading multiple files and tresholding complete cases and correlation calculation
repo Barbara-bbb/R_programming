@@ -1,1 +1,180 @@
+## Written a function that reads all files and a treshold for complete cases and calculates the correlation 
+# between sulfate and nitrate for monitor locations, where the number of completely observed cases is greater than the treshold.
 
+# Checking for each monitor if there are at least  'treshold' numbers of complete data sets. 
+# If that's the case then calculating the correlation between 'nitrate' and 'sulfate' for these, monitor and store that value in a vector. 
+# At the end, returning that vector.
+
+# TEST CASES
+# cr <- corr("specdata", 150)  # Works well
+# cr <- corr("specdata", 400)  # Works well
+# cr <- corr("specdata", 5000) # Out of bonds, Works well
+# cr <- corr("specdata", 0)    # Works well
+# head(cr)
+# summary(cr)
+
+
+rm(list=ls())  # clear workspace
+#print(R.version.string)
+#setting working directory
+working_directory <- setwd(“~/…/specdata”)
+
+## File name definiton
+file_name_ext <- '.csv'
+
+file_name_1A <- '00'
+file_name_1A2 <- c(1:9)
+file_name_1 <- paste(file_name_1A, file_name_1A2, file_name_ext, sep ="")
+
+file_name_2A <- '0'
+file_name_2A2 <- c(10:99)
+file_name_2 <- paste(file_name_2A, file_name_2A2, file_name_ext, sep ="")
+
+file_name_3A2 <- c(100:332)
+file_name_3 <- paste(file_name_3A2, file_name_ext, sep ="")
+
+file_name_final <- c(file_name_1, file_name_2, file_name_3)
+
+file_name_final <- matrix(as.character(file_name_final))  ## create matrix as character
+file_name_final
+
+## MAIN FUNCTION
+
+# directory <- c("specdata")
+#pollutant <- c("sulfate", "nitrate")
+
+# SINGLE FILE test
+# id <- 2:6   #  given sequence of files
+
+id2<- 1:332   #fixed number, for all files
+# treshold = 0
+
+corr <- function(directory, treshold)  {   # what does the treshold mean?
+      
+      if (directory == "specdata") {
+            working_directory    # to be continued if necessary for the future
+      }
+      
+      id2 <- matrix(id2)  # create a vector
+      file <- matrix(file_name_final[id2, 1])   #  matrix with multiple file names
+      
+      #empty matrixes:
+      nobs<-matrix(nrow=nrow(id2), ncol=1)
+      file_list <-matrix(nrow=nrow(id2), ncol=1)
+
+      
+      for (i in 1:nrow(id2)) {   # number count of files in total
+            
+            mydata <- read.csv(file[i, ], header = TRUE)   # header = FALSE  # read first element of file matrix
+            
+            # if (pollutant == "sulfate") {      
+            
+            col_date <- data.frame(mydata[  ,1])  #columns definition of data file
+            col_sulfate <- data.frame(mydata[  ,2])
+            col_nitrate <- data.frame(mydata[  ,3])
+            col_id <- data.frame(mydata[  ,4])
+            
+            # print(col_date[1:10,1])  # only for check
+            # print(col_sulfate[1:10,1]) # only for check
+            # print(col_id [1:10,1])  # only for check
+            
+            help_1s <- data.frame(col_date, col_sulfate, col_nitrate, col_id)
+            #print(help_1s[1:10,  ])  # only for check
+            
+           good <- complete.cases(help_1s)  # removing NA is sulfate matrix
+           help_1s <- help_1s[good, ]
+            
+            col_date <- help_1s[ ,1]  #collection of multiple files data, one file at step i
+            col_sulfate <- help_1s [  ,2]
+            col_nitrate <- help_1s [  ,3]
+            col_id <- help_1s [ , 4]
+        
+            # col_sulfate<-matrix(col_sulfate) 
+            # col_nitrate<-matrix(col_nitrate) 
+            
+            col_sulfate<-data.frame(col_sulfate) 
+            col_nitrate<-data.frame(col_nitrate)
+            col_sulfate_nitrate <- cbind(col_sulfate, col_nitrate)
+            col_sulfate_nitrate <- matrix(col_sulfate_nitrate)
+            
+             k0<-nrow(col_sulfate)  # this is related to the treshold
+             k0<-matrix(k0)
+         #    print(k0)
+
+            nobs[i]<-k0   # how many complete cases in each file (for each loop i)
+        #     print('nobs_1')
+        #    print(nobs)
+            
+      }
+      
+      #1  #list for all files, even empty ones
+      nobs<-matrix(nobs)  # final data frame, ready for extraction
+      #print(nobs)
+  
+      norow_nobs <-nrow(nobs)  # how long
+      #print(norow_nobs)    
+              
+      file_name_final <- c(file_name_final) # conversion
+      nobs <-data.frame(nobs)
+      
+      #print(file_name_final) 
+      norow_file_name_final <-nrow(file_name_final)  # how long
+      #print(norow_file_name_final)    
+      
+      allfiles<- cbind(file_name_final, nobs)
+      #print( allfiles) 
+      
+     # print(file_list_nobs)
+      
+      #2 # list for all files, with actual data
+      
+      #extract rows / files with nobs > treshold
+      u <- allfiles [ , 2] > treshold    # logical vector: TRUE / FALSE, u is a logical index
+      
+      u<-data.frame(u)
+      v<-data.frame(file_name_final,u)
+      #print(v)
+      #print(nrow(v))
+      
+      d<-v[ u==TRUE, ] 
+      #print(d)
+      #print(nrow(d))
+      
+      d1_file_list<-matrix(as.character(d[ ,1]))  # list of extracted file names for nobs > treshold
+     # print( d1_file_list)
+      #print(nrow(d1_file_list))
+      
+      #empty matrix
+      collector_matrix <- matrix(nrow=nrow(d), ncol=1)
+    
+      for (j in 1:nrow(d)) {   # number extracted files (above treshold)
+            
+            mydata_extractedfiles <- read.csv(d1_file_list[j, ], header = TRUE)   # header = FALSE  # read first element of file matrix
+            
+            col_date_e <- data.frame(mydata_extractedfiles[  ,1])  #columns definition of data file
+            col_sulfate_e <- data.frame(mydata_extractedfiles[  ,2])
+            col_nitrate_e <- data.frame(mydata_extractedfiles[  ,3])
+            col_id_e <- data.frame(mydata_extractedfiles[  ,4])
+            
+            help_1se <- data.frame(col_date_e,col_sulfate_e, col_nitrate_e, col_id_e)
+            #print(help_1s[1:10,  ])  # only for check
+            
+            good_e <- complete.cases(help_1se)  # removing NA is sulfate matrix
+            help_1se <- help_1se[good_e, ]
+            
+           
+            col_sulfate_e <- help_1se [  ,2]
+            col_nitrate_e <- help_1se [  ,3]
+            
+            correlation<- cor(col_sulfate_e, col_nitrate_e)
+            # print(correlation)
+             collector_matrix[j]<-correlation   # FINAL CORRELATION MATRIX
+            
+      }
+      
+      collector_matrix<- c(collector_matrix)
+      print( collector_matrix)
+    # print( summary(collector_matrix))
+      
+     
+}
