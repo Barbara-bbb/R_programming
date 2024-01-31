@@ -1,1 +1,127 @@
+## Written a funciton that reads a directory of full files and reports the number 
+# of completely observed cases in each data file.
 
+rm(list=ls())  # clear workspace
+print(R.version.string)
+#setting working directory
+working_directory <- setwd(“~/…/specdata”)
+
+## File name definiton
+file_name_ext <- '.csv'
+
+file_name_1A <- '00'
+file_name_1A2 <- c(1:9)
+file_name_1 <- paste(file_name_1A, file_name_1A2, file_name_ext, sep ="")
+
+file_name_2A <- '0'
+file_name_2A2 <- c(10:99)
+file_name_2 <- paste(file_name_2A, file_name_2A2, file_name_ext, sep ="")
+
+file_name_3A2 <- c(100:332)
+file_name_3 <- paste(file_name_3A2, file_name_ext, sep ="")
+
+file_name_final <- c(file_name_1, file_name_2, file_name_3)
+
+file_name_final <- matrix(as.character(file_name_final))  ## create matrix as character
+file_name_final
+
+## MAIN FUNCTION
+
+# directory <- c("specdata")
+# pollutant <- c("sulfate", "nitrate")
+
+# SINGLE FILE test
+# id <- 2:6   #  given sequence of files
+
+complete <- function(directory, id2)  {
+      
+      id2 <- matrix(id2)  # create a vector
+      file <- matrix(file_name_final[id2, 1])   #  matrix with multiple file names
+      
+      #empty matrixes:
+      nobs<-matrix(nrow=nrow(id2), ncol=1)
+      id<-matrix(nrow=nrow(id2), ncol=1)
+      #collector_matrix <- matrix(nrow=k2, ncol=1)
+      
+      #create an empty big matrix for collecting data from all files
+      collector_matrix <- matrix(nrow=2000000, ncol=nrow(id2))  # This number must be larger than k2
+      print(collector_matrix)
+      # d<-dim(collector_matrix)
+      # print(d)
+      
+      
+      for (i in 1:nrow(id2)) {   # number count of files in total
+            
+            mydata <- read.csv(file[i, ], header = TRUE)   # header = FALSE  # read first element of file matrix
+            
+            # if (pollutant == "sulfate") {      
+                  
+                  col_date <- data.frame(mydata[  ,1])  #columns definition of data file
+                  col_sulfate <- data.frame(mydata[  ,2])
+                  col_id <- data.frame(mydata[  ,4])
+                  
+                  # print(col_date[1:10,1])  # only for check
+                  # print(col_sulfate[1:10,1]) # only for check
+                  # print(col_id [1:10,1])  # only for check
+                  
+                  help_1s <- data.frame(col_date, col_sulfate, col_id)
+                  print(help_1s[1:10,  ])  # only for check
+                  
+                  good <- complete.cases(help_1s)  # removing NA is sulfate matrix
+                  help_1s <- help_1s[good, ]
+                  
+                  col_date <- help_1s[ ,1]  #collection of multiple files data, one file at step i
+                  col_sulfate <- help_1s [  ,2]
+                  col_id <- help_1s [ , 3]
+              
+                  
+                  col_sulfate<-matrix(col_sulfate) 
+                  k0<-nrow(col_sulfate)
+                  print(k0)
+                  
+                  k0<-matrix(k0)
+                  print(k0)
+                  
+                  nobs[i]<-k0
+                    print('nobs_1')
+                  print(nobs)
+                  
+                  
+                  col_id<-matrix(col_id)
+                  p0<-col_id[1,1]
+                  print(p0)
+                  
+                  p0<-matrix(p0)
+                  print(p0)
+                  
+                  id[i]<-p0
+                        print('id')
+                  print(id)
+                  
+                  # no  <-  matrix (nrow=nrow(id2),ncol=2) # MAIN MATRIX
+                  # colnames(no)<-c("id","nobs")
+                  # no[ , 1]<- id
+                  # no [ , 2]<-nobs
+                  # 
+                  
+                   no <- data.frame(id,nobs)
+                  
+                         print('nobs_2')
+                  print(no)                         # MAIN MATRIX
+                  
+                  k2 <- sum(nobs)
+                  print(k2)  # number of rows in all files - this works well!
+                  k2<-c(k2
+                     
+      }
+      #for verification and troubleshooting
+      # file
+      # # k2
+      # collector_matrix
+      # mean_pollutant <-mean(collector_matrix, na.rm=TRUE)
+      # print('pollutantmean')
+      # print(mean_pollutant)
+      
+      no
+      
+}
