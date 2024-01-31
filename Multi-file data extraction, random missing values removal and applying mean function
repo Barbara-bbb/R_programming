@@ -1,1 +1,180 @@
+## Written a function that takes the arguments: directory, poluttant, id of monitor numbers (number of files is 332 files in total) 
+# and returns calculated mean, after removing NA values. Each files contains coulmns: date, sulfate, nitrate, id. Each file has various 
+# length of data, with NA randomly distributed values for sulfate and nitrate data.
 
+# TEST CASES
+# pollutantmean(“specdata","sulfate",1:10) # calculate mean out of 1-10 files for sulfate, remove NA values, use ‘specdata’ directory
+# pollutantmean(“specdata","nitrate",70:72) # calculate mean out of 70-72 files for nitrate, remove NA values, use ‘specdata’ directory
+# pollutantmean("specdata","nitrate",23)
+# pollutantmean("specdata","sulfate",34)
+# pollutantmean("specdata","nitrate",1:332)
+
+rm(list=ls())  # clear workspace
+print(R.version.string)
+#setting working directory
+working_directory <- setwd(“~/…/specdata”)
+
+## File name definiton
+file_name_ext <- '.csv'
+
+file_name_1A <- '00'
+file_name_1A2 <- c(1:9)
+file_name_1 <- paste(file_name_1A, file_name_1A2, file_name_ext, sep ="")
+
+file_name_2A <- '0'
+file_name_2A2 <- c(10:99)
+file_name_2 <- paste(file_name_2A, file_name_2A2, file_name_ext, sep ="")
+
+file_name_3A2 <- c(100:332)
+file_name_3 <- paste(file_name_3A2, file_name_ext, sep ="")
+
+file_name_final <- c(file_name_1, file_name_2, file_name_3)
+
+file_name_final <- matrix(as.character(file_name_final))  ## create matrix as character
+file_name_final
+
+## MAIN FUNCTION
+
+# directory <- c("specdata")
+#pollutant <- c("sulfate", "nitrate")
+
+# SINGLE FILE test
+# id <- 2:6   #  given sequence of files
+
+pollutantmean <- function(directory, pollutant, id)  {
+      
+      if (directory == "specdata") {
+            working_directory    # to be continued if necessary for the future
+      }
+      
+      id <- matrix(id)  # create a vector
+      file <- matrix(file_name_final[id, 1])   #  matrix with multiple file names
+
+      #empty matrixes:
+      k<-matrix(nrow=nrow(id), ncol=1
+      
+      #create an empty big matrix for collecting data from all files
+      collector_matrix <- matrix(nrow=2000000, ncol=nrow(id))  # This number must be larger than k2
+      # print(collector_matrix)
+      # # d<-dim(collector_matrix)
+      # # print(d)
+
+      
+      for (i in 1:nrow(id)) {   # number count of files in total
+            
+            mydata <- read.csv(file[i, ], header = TRUE)   # header = FALSE  # read first element of file matrix
+            
+            if (pollutant == "sulfate") {      
+                  
+                #  col_date <- data.frame(mydata[  ,1])  #columns definition of data file
+                  col_sulfate <- data.frame(mydata[  ,2])
+                 # col_id <- data.frame(mydata[  ,4])
+                  
+                  # print(col_date[1:10,1])  # only for check
+                  # print(col_sulfate[1:10,1]) # only for check
+                  # print(col_id [1:10,1])  # only for check
+                  
+               #   help_1s <- data.frame(col_date, col_sulfate, col_id)
+                  help_1s <- data.frame( col_sulfate)
+                 # print(help_1s[1:10,  ])  # only for check
+            
+                  good <- complete.cases(help_1s)  # removing NA is sulfate matrix
+                  help_1s <- help_1s[good, ]
+                  
+                 # col_date <- help_1s[ ,1]  #collection of multiple files data, one file at step i
+                 # col_sulfate <- help_1s [  ,2]
+                  col_sulfate <- help_1s 
+                 # col_id <- help_1s [ , 3]
+                  
+                  col_sulfate<-matrix(col_sulfate) 
+                  k0<-nrow(col_sulfate)
+                  print(k0)
+
+                  k0<-matrix(k0)
+                  print(k0)
+                  
+                  k[i]<-k0
+                  print('nobs')
+                  print(k)
+                  
+                          no<-matrix (nrow=nrow(id),ncol=2)
+                          no[ , 1]<- 1:nrow(id)
+                          no [ , 2]<-k
+                          
+                          print('nobs')
+                          print(no)
+                          
+                  k2 <- sum(k)
+                  print(k2)  # number of rows in all files                  				  k2<-c(k2)
+                             
+                  #fill the matrix with data sets for each i loop
+                  if (k0 == 0) {
+                        next  # skip the loop is matrix has no good values (zero lenght matrix)
+                  } else{
+                        collector_matrix[ 1:k0, i] <- col_sulfate
+                         }
+                 
+                  
+            } else {
+                 # col_date <- data.frame(mydata[  ,1])  #columns definition of data file
+                  col_nitrate <- data.frame(mydata[  ,3])
+                  #col_id <- data.frame(mydata[  ,4])
+                  
+                  # print(col_date[1:10,1])  # only for check
+                  # print(col_nitrate[1:10,1]) # only for check
+                  # print(col_id [1:10,1])  # only for check
+                  
+                 # help_1s <- data.frame(col_date, col_nitrate, col_id)
+                  help_1s <- data.frame(col_nitrate)
+                 #  print(help_1s[1:10,  ])  # only for check
+                  
+                  good <- complete.cases(help_1s)  # removing NA is sulfate matrix
+                  help_1s <- help_1s[good, ]
+                  
+                 #  col_date <- help_1s[ ,1]  #collection of multiple files data, one file at step i
+                 # col_nitrate <- help_1s [  ,1]
+                  col_nitrate <- help_1s 
+                  # col_id <- help_1s [ , 3]
+                  
+                  col_nitrate<-matrix(col_nitrate) 
+                  k0<-nrow(col_nitrate)
+                  print(k0)
+                  
+                  k0<-matrix(k0)
+                  print(k0)
+                  
+                  k[i]<-k0
+                  print('nobs')
+                  print(k)
+                               no<-matrix (nrow=nrow(id),ncol=2)
+                               no[ , 1]<- 1:nrow(id)
+                               no [ , 2]<-k
+                  
+                  print('nobs')
+                  print(no)
+                  k2 <- sum(k)
+                  print(k2)  # number of rows in all files                  					k2<-c(k2)
+                  
+                  # if (k2<2000000)  {
+                  # print('OK')
+                  # }
+                              
+                  #fill the matrix with data sets for each i loop
+      
+                  if (k0 == 0) {
+                        next  # skip the loop is matrix has no good values (zero lenght matrix)
+                  } else{
+                        collector_matrix[ 1:k0, i] <- col_nitrate
+                  }
+ 
+            }
+      }
+      #for verification and troubleshooting
+      file
+      # k2
+      collector_matrix
+      
+      mean_pollutant <-mean(collector_matrix, na.rm=TRUE)
+      print('pollutantmean')
+      print(mean_pollutant)
+}
